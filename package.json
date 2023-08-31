@@ -11,7 +11,7 @@
     "dist": "npm run clean && webpack --env prod",
     "dist-windows": "npm run clean-windows && webpack --env prod",
     "clean": "rm -rf dist",
-    "clean-windows": "DEL /S dist && y",
+    "clean-windows": "DEL /S dist",
     "release:patch": "npm version patch --tag-version-prefix= && npm run release:publish",
     "release:minor": "npm version minor --tag-version-prefix= && npm run release:publish",
     "release:major": "npm version major --tag-version-prefix= && npm run release:publish",
