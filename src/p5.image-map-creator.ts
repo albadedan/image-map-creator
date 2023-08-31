@@ -37,6 +37,7 @@ export class Save {
 export class imageMapCreator {
 	protected width: number;
 	protected height: number;
+	protected showEmbeddingFunctions: boolean;
 	protected tool: Tool;
 	protected drawingTools: Tool[];
 	protected settings: any;
@@ -48,6 +49,10 @@ export class imageMapCreator {
 		SetTitle: {
 			onSelect: (target: Element, key: any, item: HTMLElement, area: Area) => { this.setAreaTitle(area); },
 			label: "Set title",
+		},
+		SetValue: {
+			onSelect: (target: Element, key: any, item: HTMLElement, area: Area) => { this.setAreaValue(area); },
+			label: "Set value",
 		},
 		Delete: (target: Element, key: any, item: HTMLElement, area: Area) => { this.deleteArea(area); },
 		MoveFront: {
@@ -82,11 +87,16 @@ export class imageMapCreator {
 	 * @param {number} width
 	 * @param {number} height
 	 */
-	constructor(elementId: string, width: number = 600, height: number = 450) {
+	constructor(elementId: string, width: number = 600, height: number = 450, showEmbeddingFunctions: boolean = false) {
+		console.log("🚀 ~ file: p5.image-map-creator.ts:91 ~ imageMapCreator ~ constructor ~ showEmbeddingFunctions:", showEmbeddingFunctions)
+		console.log("🚀 ~ file: p5.image-map-creator.ts:91 ~ imageMapCreator ~ constructor ~ height:", height)
+		console.log("🚀 ~ file: p5.image-map-creator.ts:91 ~ imageMapCreator ~ constructor ~ width:", width)
+		console.log("🚀 ~ file: p5.image-map-creator.ts:91 ~ imageMapCreator ~ constructor ~ elementId:", elementId)
 		const element = document.getElementById(elementId);
 		if (!element) throw new Error('HTMLElement not found');
-		this.width = width;
-		this.height = height;
+		this.width = (typeof width === typeof true ? 600 : width);
+		this.height = ((typeof height === typeof true ? 450 : height));
+		this.showEmbeddingFunctions = (typeof width === typeof true ? Boolean(width) : (typeof height === typeof true ? Boolean(height) : showEmbeddingFunctions));
 		this.tool = "polygon";
 		this.drawingTools = ["rectangle", "circle", "polygon"];
 		this.settings;
@@ -153,7 +163,12 @@ export class imageMapCreator {
 			.addButton("Generate Html", () => { this.settings.setValue("Output", this.map.toHtml()) })
 			.addButton("Generate Svg", () => { this.settings.setValue("Output", this.map.toSvg()) })
 			.addTextArea("Output")
-			.addButton("Save", this.save.bind(this));
+			.addButton("Download", this.save.bind(this))
+		
+		if (this.showEmbeddingFunctions) {
+			this.settings.addButton("Accept", this.provide.bind(this))
+			this.settings.addButton("Close", this.cancel())
+		}
 		//@ts-ignore Fix for oncontextmenu
 		this.p5.canvas.addEventListener("contextmenu", (e) => { e.preventDefault(); });
 		//@ts-ignore Fix for middle click mouse down triggers scroll on windows
@@ -597,6 +612,15 @@ export class imageMapCreator {
 		download(blob, `${this.map.getName()}.map.json`, 'application/json')
 	}
 
+	provide(): Object {
+		//@ts-ignore encoding options for Chrome
+		return {json: this.exportMap(), html: this.map.toHtml()}
+	}
+
+	cancel(): boolean {
+		return false
+	}
+
 	importMap(json: string): void {
 		let object = JSON.parse(json);
 		let objectMap = object.map;
@@ -671,6 +695,21 @@ export class imageMapCreator {
 			this.undoManager.add({
 				undo: () => area.setTitle(title),
 				redo: () => area.setTitle(input!),
+			});
+		}
+	}
+
+	/**
+	 * Set the value of an area if you want to return a value that is different to the title. Useful if using the map in a form.
+	 */
+	setAreaValue(area: Area): void {
+		let value = area.getValue();
+		let input = prompt("Enter the value of this area", value ? value : "");
+		if (input) {
+			area.setValue(input);
+			this.undoManager.add({
+				undo: () => area.setValue(value),
+				redo: () => area.setValue(input!),
 			});
 		}
 	}

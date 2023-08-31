@@ -5,7 +5,7 @@
 --->
 
 This is a simple map creator tool made with the p5.js library. I want it
-to be easy to use for both the end user and the developper. This work is
+to be easy to use for both the end user and the developer. This work is
 still in beta so a lot of things are about to change (including the save
 file's structure).
 
@@ -89,13 +89,13 @@ Add a `<div>` with an id, then instantiate the p5 object like this :
 let iMap = new imageMapCreator("div-id");
 ```
 
-The contructor of imageMapCreator accepts these parameters :
+The constructor of imageMapCreator accepts these parameters :
 
 ```js
-new imageMapCreator(elementId [, width = 600 [, height = 450 ]]);
+new imageMapCreator(elementId [, width = 600 [, height = 450 [, showEmbeddingFunctions = false ]]]);
 ```
 
-You can also see the detailled example in the [`/demos`](demos) folder.
+You can also see the detailed example in the [`/demos`](demos) folder.
 
 ## Development
 
